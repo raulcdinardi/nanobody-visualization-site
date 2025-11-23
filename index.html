@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antibody Design - Interactive Data Table</title>
+
+    <!-- D3.js for data manipulation -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- NGL Viewer for 3D molecule figure -->
+    <script src="https://cdn.jsdelivr.net/gh/arose/ngl@v2.0.0-dev.37/dist/ngl.js"></script>
+
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-hover: #d1d5db;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --hover-bg: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 18px;
+            font-weight: 400;
+            text-align: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        .hero-section h1 {
+            color: white;
+            font-size: 42px;
+            margin-bottom: 16px;
+        }
+
+        .hero-section .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hero-stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .plots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .plot-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .plot-card img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+
+        .plot-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .plot-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .top-designs {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 40px;
+        }
+
+        .designs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .design-card {
+            background: #f8fafc;
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .design-rank {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .design-model {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .design-config {
+            font-family: 'Monaco', 'Consolas', monospace;
+            background: #e5e7eb;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .design-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .design-metric {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .design-metric-label {
+            color: var(--text-secondary);
+        }
+
+        .design-metric-value {
+            font-weight: 600;
+        }
+
+        /* Chart Styles */
+        .chart-container {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 40px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 24px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .toggle-btn:hover {
+            background: #e5e7eb;
+            color: var(--text-primary);
+        }
+
+        .toggle-btn.active {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .bar-group {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .bar-group:hover {
+            opacity: 0.85;
+        }
+
+        .bar-individual {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bar-individual:hover {
+            opacity: 0.8;
+            stroke: #333;
+            stroke-width: 2;
+        }
+
+        .paper-btn {
+            display: inline-block;
+            background: #4A90E2;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
+        }
+
+        .paper-btn:hover {
+            background: #357ABD;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .content-text {
+            max-width: 900px;
+            margin: 60px auto;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .content-text p {
+            margin-bottom: 24px;
+        }
+
+        .content-text-with-figure {
+            max-width: 1000px;
+            margin: 60px auto;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-size: 18px;
+            text-align: justify;
+        }
+
+        .content-text-with-figure p {
+            margin-bottom: 24px;
+        }
+
+        .figure-container {
+            float: right;
+            width: 480px;
+            margin: 0 0 20px 20px;
+            background: transparent;
+            break-inside: avoid;
+            shape-outside: margin-box;
+        }
+
+        .molecule-figure {
+            width: 100%;
+            height: 380px;
+            background: transparent;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .molecule-figure > div {
+            position: relative !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .molecule-figure canvas {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+
+        .figure-caption {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .figure-caption strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .figure-container {
+                float: none;
+                width: 100%;
+                margin: 20px 0;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .content-text-with-figure {
+                text-align: left;
+            }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .model-toggles {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .model-toggle {
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            color: var(--text-secondary);
+        }
+
+        .model-toggle:hover {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--text-primary);
+        }
+
+        .model-toggle.active {
+            font-weight: 600;
+            color: white;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .search-box {
+            padding: 10px 16px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 400;
+            font-family: inherit;
+            min-width: 250px;
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.2s;
+        }
+
+        .search-box:hover, .search-box:focus {
+            border-color: var(--border-hover);
+            outline: none;
+        }
+
+        .search-box::placeholder {
+            color: var(--text-muted);
+        }
+
+
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+
+            .table-wrapper {
+                max-height: 60vh;
+            }
+
+            th, td {
+                padding: 12px 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            border-top-color: var(--text-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Title -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1>LLM-Enabled Nanobody Design Results</h1>
+        </div>
+
+        <!-- Read Paper Button -->
+        <div style="text-align: center; margin-bottom: 60px;">
+            <a href="#" id="paperLink" class="paper-btn">Read Full Paper</a>
+        </div>
+
+        <!-- Text with 3D Figure -->
+        <div class="content-text-with-figure">
+            <div class="figure-container">
+                <div class="molecule-figure" id="moleculeFigure"></div>
+                <div class="figure-caption">
+                    <strong>Figure 1:</strong> Nanobody design generated by <strong id="figureModelName">DEEPSEEK REASONER</strong> with ipSAE score of <strong id="figureScore">0.880</strong>. The structure shows the antibody-antigen interface optimized for enhanced binding affinity.
+                </div>
+            </div>
+
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+
+            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.</p>
+
+            <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?</p>
+        </div>
+
+        <!-- Model Filter -->
+        <div style="margin-bottom: 40px; text-align: center;">
+            <div class="control-group">
+                <div class="control-label">Filter Models</div>
+                <div class="model-toggles" id="modelToggles"></div>
+            </div>
+        </div>
+
+        <!-- Histogram Chart -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Performance Comparison</h3>
+                <div class="chart-controls">
+                    <div class="control-group">
+                        <div class="control-label">View Mode</div>
+                        <div class="view-toggle" id="viewToggle">
+                            <button class="toggle-btn active" data-view="average">Model Averages</button>
+                            <button class="toggle-btn" data-view="individual">Individual Runs</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">Metric</div>
+                        <select class="metric-select" id="metricSelect"></select>
+                    </div>
+                </div>
+            </div>
+            <svg id="chart"></svg>
+        </div>
+    </div>
+
+
+    <!-- Data -->
+    <script src="ipsae_individual_data.js"></script>
+
+    <script>
+        // ==================================================================
+        // DATA MANAGEMENT & STATE
+        // ==================================================================
+        let allRuns = [];
+        let filteredRuns = [];
+        let activeModels = new Set();
+        let currentSort = { column: 'ipsae_score', direction: 'desc' };
+        let searchTerm = '';
+        let currentViewMode = 'average'; // 'average' or 'individual'
+        let currentMetric = 'ipSAE';
+
+        // Chart dimensions
+        const margin = { top: 30, right: 30, bottom: 60, left: 60 };
+        const width = 700 - margin.left - margin.right;
+        const height = 350 - margin.top - margin.bottom;
+
+
+        // Chart SVG
+        let chartSvg = null;
+
+        // Figure stage for the inline 3D molecule
+        let figureStage = null;
+
+        // ==================================================================
+        // INITIALIZE DATA
+        // ==================================================================
+        function initializeData() {
+            // Flatten all runs from all models into a single array
+            allRuns = [];
+
+            Object.entries(IPSAE_EVALUATION_DATA.models).forEach(([modelId, modelData]) => {
+                activeModels.add(modelId); // Initially all models are active
+
+                modelData.runs.forEach(run => {
+                    allRuns.push({
+                        ...run,
+                        model_name: modelData.name,
+                        model_color: modelData.color,
+                        hotspot_count: run.hotspots ? run.hotspots.length : 0
+                    });
+                });
+            });
+
+            filteredRuns = [...allRuns];
+            console.log(`Initialized with ${allRuns.length} runs from ${Object.keys(IPSAE_EVALUATION_DATA.models).length} models`);
+        }
+
+        // ==================================================================
+        // INITIALIZE CONTROLS
+        // ==================================================================
+        function initControls() {
+            // Initialize chart SVG
+            chartSvg = d3.select('#chart')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // View mode toggle
+            d3.selectAll('.toggle-btn').on('click', function() {
+                const viewMode = d3.select(this).attr('data-view');
+                currentViewMode = viewMode;
+
+                d3.selectAll('.toggle-btn').classed('active', false);
+                d3.select(this).classed('active', true);
+
+                updateChart();
+            });
+
+            // Metric select for chart
+            const metricSelect = d3.select('#metricSelect');
+            Object.entries(IPSAE_EVALUATION_DATA.metrics).forEach(([id, metric]) => {
+                metricSelect.append('option')
+                    .attr('value', id)
+                    .text(metric.label);
+            });
+            metricSelect.property('value', currentMetric);
+            metricSelect.on('change', function() {
+                currentMetric = this.value;
+                updateChart();
+            });
+
+            // Model toggles
+            const modelToggles = d3.select('#modelToggles');
+            Object.entries(IPSAE_EVALUATION_DATA.models).forEach(([id, model]) => {
+                const btn = modelToggles.append('button')
+                    .attr('class', 'model-toggle active')
+                    .style('border-color', model.color)
+                    .style('background', model.color)
+                    .style('color', 'white')
+                    .text(model.name)
+                    .on('click', function() {
+                        const button = d3.select(this);
+                        if (activeModels.has(id)) {
+                            activeModels.delete(id);
+                            button.classed('active', false);
+                            button.style('color', model.color);
+                            button.style('background', 'transparent');
+                        } else {
+                            activeModels.add(id);
+                            button.classed('active', true);
+                            button.style('color', 'white');
+                            button.style('background', model.color);
+                        }
+                        updateChart(); // This should fix the update issue
+                    });
+            });
+
+        }
+
+
+        // ==================================================================
+        // CHART FUNCTIONS
+        // ==================================================================
+        function updateChart() {
+            if (!chartSvg) return;
+
+            const metric = IPSAE_EVALUATION_DATA.metrics[currentMetric];
+            chartSvg.selectAll('*').remove();
+
+            if (currentViewMode === 'average') {
+                updateAverageChart();
+            } else {
+                updateIndividualChart();
+            }
+        }
+
+        function updateAverageChart() {
+            const metric = IPSAE_EVALUATION_DATA.metrics[currentMetric];
+
+            // Calculate averages for each active model
+            const modelAverages = [];
+            Array.from(activeModels).forEach(modelId => {
+                const model = IPSAE_EVALUATION_DATA.models[modelId];
+                const values = model.runs.map(run => run[currentMetric]);
+                const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+
+                modelAverages.push({
+                    modelId,
+                    name: model.name,
+                    color: model.color,
+                    value: avg,
+                    count: values.length
+                });
+            });
+
+            // Scales
+            const x = d3.scaleBand()
+                .domain(modelAverages.map(d => d.name))
+                .range([0, width])
+                .padding(0.3);
+
+            const maxValue = d3.max(modelAverages, d => d.value);
+            const y = d3.scaleLinear()
+                .domain([0, maxValue * 1.1])
+                .range([height, 0]);
+
+            // X axis
+            chartSvg.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('fill', '#6b7280')
+                .style('font-family', 'Inter, sans-serif')
+                .style('font-weight', '500')
+                .style('font-size', '10px')
+                .attr('transform', 'translate(0, 15)')
+                .text(d => d.replace(/\s+/g, ' '));
+
+            // Y axis
+            chartSvg.append('g')
+                .call(d3.axisLeft(y))
+                .selectAll('text')
+                .attr('fill', '#6b7280')
+                .style('font-family', 'Inter, sans-serif')
+                .style('font-weight', '500')
+                .style('font-size', '12px');
+
+            // Y axis label
+            chartSvg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -50)
+                .attr('x', -height / 2)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#6b7280')
+                .style('font-family', 'Inter, sans-serif')
+                .style('font-weight', '600')
+                .style('font-size', '13px')
+                .text(metric.label);
+
+            // Bars
+            chartSvg.selectAll('.bar')
+                .data(modelAverages)
+                .join('rect')
+                .attr('class', 'bar bar-average')
+                .attr('x', d => x(d.name))
+                .attr('width', x.bandwidth())
+                .attr('y', height)
+                .attr('height', 0)
+                .attr('fill', d => d.color)
+                .attr('rx', 4)
+                .transition()
+                .duration(750)
+                .attr('y', d => y(d.value))
+                .attr('height', d => height - y(d.value));
+
+            // Value labels
+            chartSvg.selectAll('.value-label')
+                .data(modelAverages)
+                .join('text')
+                .attr('class', 'value-label')
+                .attr('x', d => x(d.name) + x.bandwidth() / 2)
+                .attr('y', d => y(d.value) - 5)
+                .attr('text-anchor', 'middle')
+                .style('font-family', 'Inter, sans-serif')
+                .style('font-weight', '600')
+                .style('font-size', '12px')
+                .style('fill', '#374151')
+                .text(d => d.value.toFixed(3));
+        }
+
+        function updateIndividualChart() {
+            const metric = IPSAE_EVALUATION_DATA.metrics[currentMetric];
+
+            // Prepare individual run data
+            const individualData = [];
+            Array.from(activeModels).forEach(modelId => {
+                const model = IPSAE_EVALUATION_DATA.models[modelId];
+                model.runs.forEach((run, index) => {
+                    individualData.push({
+                        modelId,
+                        modelName: model.name,
+                        color: model.color,
+                        value: run[currentMetric],
+                        runIndex: index,
+                        configId: run.config_id,
+                        run: run
+                    });
+                });
+            });
+
+            // Group by model for positioning
+            const modelGroups = d3.group(individualData, d => d.modelId);
+            const modelNames = Array.from(activeModels).map(id => IPSAE_EVALUATION_DATA.models[id].name);
+
+            // Scales
+            const x0 = d3.scaleBand()
+                .domain(modelNames)
+                .range([0, width])
+                .padding(0.2);
+
+            const maxRunsPerModel = d3.max(Array.from(modelGroups.values()), group => group.length);
+            const x1 = d3.scaleBand()
+                .domain(d3.range(maxRunsPerModel))
+                .range([0, x0.bandwidth()])
+                .padding(0.05);
+
+            const maxValue = d3.max(individualData, d => d.value);
+            const y = d3.scaleLinear()
+                .domain([0, maxValue * 1.1])
+                .range([height, 0]);
+
+            // X axis
+            chartSvg.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x0))
+                .selectAll('text')
+                .attr('fill', '#6b7280')
+                .style('font-family', 'Inter, sans-serif')
+                .style('font-weight', '500')
+                .style('font-size', '10px')
+                .attr('transform', 'translate(0, 15)')
+                .text(d => d.replace(/\s+/g, ' '));
+
+            // Y axis
+            chartSvg.append('g')
+                .call(d3.axisLeft(y))
+                .selectAll('text')
+                .attr('fill', '#6b7280')
+                .style('font-family', 'Inter, sans-serif')
+                .style('font-weight', '500')
+                .style('font-size', '12px');
+
+            // Y axis label
+            chartSvg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -50)
+                .attr('x', -height / 2)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#6b7280')
+                .style('font-family', 'Inter, sans-serif')
+                .style('font-weight', '600')
+                .style('font-size', '13px')
+                .text(metric.label);
+
+            // Individual bars
+            chartSvg.selectAll('.bar-individual')
+                .data(individualData)
+                .join('rect')
+                .attr('class', 'bar bar-individual')
+                .attr('x', d => x0(d.modelName) + x1(d.runIndex))
+                .attr('width', x1.bandwidth())
+                .attr('y', height)
+                .attr('height', 0)
+                .attr('fill', d => d.color)
+                .attr('rx', 2)
+                .transition()
+                .duration(750)
+                .attr('y', d => y(d.value))
+                .attr('height', d => height - y(d.value));
+        }
+
+        // ==================================================================
+        // 3D MOLECULE FIGURE
+        // ==================================================================
+        async function initMoleculeFigure() {
+            const figureEl = document.getElementById('moleculeFigure');
+            console.log('🚀 Starting molecule figure initialization...');
+            console.log('Figure element:', figureEl);
+            console.log('Figure element dimensions:', figureEl.offsetWidth, 'x', figureEl.offsetHeight);
+
+            // Find the best scoring antibody design
+            let bestRun = null;
+            let bestScore = -1;
+
+            console.log('📊 Analyzing IPSAE data...');
+            Object.values(IPSAE_EVALUATION_DATA.models).forEach(model => {
+                console.log(`Model: ${model.name}, runs: ${model.runs.length}`);
+                model.runs.forEach(run => {
+                    console.log(`  Run ${run.config_id}: ipSAE = ${run.ipSAE}`);
+                    if (run.ipSAE > bestScore) {
+                        bestScore = run.ipSAE;
+                        bestRun = { ...run, model_name: model.name };
+                    }
+                });
+            });
+
+            console.log(`🏆 Best run found: ${bestRun?.model_name} with score ${bestScore}`);
+
+            if (!bestRun) {
+                console.log('❌ No suitable structure found for figure');
+                return;
+            }
+
+            // Update figure caption with the best run info
+            document.getElementById('figureModelName').textContent = bestRun.model_name;
+            document.getElementById('figureScore').textContent = bestRun.ipSAE.toFixed(3);
+
+            // Map model names to available structure files
+            const structureFileMap = {
+                'DEEPSEEK REASONER': 'structures/openai-api_deepseek-reasoner_best.cif',
+                'GPT-5': 'structures/openai_gpt-5_best.cif',
+                'GPT 5 MINI': 'structures/openai_gpt-5-mini_best.cif',
+                'CLAUDE SONNET 4.0': 'structures/anthropic_claude-sonnet-4-0_best.cif',
+                'CLAUDE HAIKU 4.5': 'structures/anthropic_claude-haiku-4-5_best.cif'
+            };
+
+            // Get the appropriate structure file
+            const structurePath = structureFileMap[bestRun.model_name] || 'structures/anthropic_claude-sonnet-4-0_best.cif';
+            console.log(`📁 Structure path: ${structurePath}`);
+
+            try {
+                console.log('🎬 Creating NGL Stage...');
+                // Create NGL stage for figure
+                figureStage = new NGL.Stage(figureEl, {
+                    backgroundColor: '#f9fafb',
+                    quality: 'high',
+                    sampleLevel: 1
+                });
+
+                console.log('🎬 NGL Stage created:', figureStage);
+                console.log('🎬 Viewer:', figureStage.viewer);
+
+                console.log(`📥 Loading structure: ${structurePath}`);
+
+                // Load the best structure
+                const component = await figureStage.loadFile(structurePath, {
+                    defaultRepresentation: false
+                });
+
+                console.log('✅ Figure structure loaded successfully!');
+                console.log('🧬 Component:', component);
+                console.log('🧬 Structure info:', component.structure);
+
+                // Check available methods on the structure object
+                console.log('🔍 Available structure methods:', Object.getOwnPropertyNames(component.structure));
+
+                // Try different ways to get chain names
+                let chainNames = [];
+                if (typeof component.structure.getChainnames === 'function') {
+                    chainNames = component.structure.getChainnames();
+                    console.log('🧬 Chain names (getChainnames):', chainNames);
+                } else if (typeof component.structure.getChainNames === 'function') {
+                    chainNames = component.structure.getChainNames();
+                    console.log('🧬 Chain names (getChainNames):', chainNames);
+                } else if (component.structure.chainStore) {
+                    // Try accessing chain store directly
+                    const chainStore = component.structure.chainStore;
+                    chainNames = [];
+                    for (let i = 0; i < chainStore.count; i++) {
+                        chainNames.push(chainStore.getChainname(i));
+                    }
+                    console.log('🧬 Chain names (chainStore):', chainNames);
+                } else {
+                    console.log('🧬 Using fallback chain names: H, T');
+                    chainNames = ['H', 'T']; // Common antibody-antigen chains
+                }
+
+                // Try to add a simple representation first to see if anything shows up
+                console.log('🎨 Adding simple cartoon representation...');
+                const repr1 = component.addRepresentation('cartoon', {
+                    color: 'chainname'
+                });
+                console.log('🎨 Simple representation added:', repr1);
+
+                // Add representations with more debugging
+                console.log('🎨 Adding specific chain representations...');
+                console.log('Available chains:', chainNames);
+
+                // Add representations for available chains
+                if (chainNames.length > 0) {
+                    chainNames.forEach((chain, index) => {
+                        const color = index === 0 ? '#22c55e' : '#3b82f6';
+                        console.log(`Adding representation for chain ${chain} with color ${color}`);
+                        try {
+                            component.addRepresentation('cartoon', {
+                                sele: `:${chain}`,
+                                color: color,
+                                quality: 'high',
+                                opacity: 0.8
+                            });
+                        } catch (reprError) {
+                            console.log(`Failed to add representation for chain ${chain}:`, reprError);
+                        }
+                    });
+                } else {
+                    // If no chains detected, just add a general representation
+                    console.log('🎨 No specific chains detected, adding general representation');
+                    component.addRepresentation('cartoon', {
+                        color: 'element',
+                        quality: 'high'
+                    });
+                }
+
+                console.log('🎯 Centering view...');
+                figureStage.autoView(1000);
+
+                // Force a render to make sure the structure is visible
+                setTimeout(() => {
+                    figureStage.viewer.requestRender();
+                    console.log('🔄 Forced render after autoView');
+                }, 100);
+
+                // Temporarily disable rotation to test if it's causing the issue
+                const enableRotation = false; // Set to true to enable rotation
+
+                if (enableRotation) {
+                    // Wait a bit before starting rotation to let the view settle
+                    setTimeout(() => {
+                        console.log('🔄 Starting gentle rotation...');
+                        // Add much slower, gentler rotation
+                        function rotateMolecule() {
+                            if (figureStage && figureStage.viewer && figureStage.compList.length > 0) {
+                                try {
+                                    figureStage.viewerControls.rotate([0.002, 0, 0]); // Much slower rotation
+                                    figureStage.viewer.requestRender();
+                                } catch (rotateError) {
+                                    console.log('Rotation error:', rotateError);
+                                }
+                            }
+                        }
+
+                        // Start slower rotation loop
+                        setInterval(rotateMolecule, 100); // Rotate every 100ms instead of 50ms
+                    }, 2000); // Wait 2 seconds before starting rotation
+                } else {
+                    console.log('🔄 Rotation disabled for testing');
+                }
+
+                console.log('✅ Molecule figure initialization complete!');
+
+            } catch (error) {
+                console.log('❌ Figure structure loading failed:', error);
+                console.log('📊 Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    stack: error.stack
+                });
+
+                // Try fallback structure
+                try {
+                    console.log('🔄 Trying fallback structure: 8JA5.cif');
+
+                    // Clean up stage first
+                    if (figureStage) {
+                        figureStage.removeAllComponents();
+                    }
+
+                    const fallbackComponent = await figureStage.loadFile('8JA5.cif', {
+                        defaultRepresentation: false
+                    });
+
+                    console.log('✅ Fallback structure loaded!');
+                    console.log('🧬 Fallback component:', fallbackComponent);
+
+                    // Just add a simple representation without worrying about specific chains
+                    fallbackComponent.addRepresentation('cartoon', {
+                        color: 'chainname',
+                        quality: 'high',
+                        opacity: 0.8
+                    });
+
+                    figureStage.autoView(1000);
+
+                    // Add rotation
+                    function rotateMolecule() {
+                        if (figureStage && figureStage.viewer) {
+                            figureStage.viewerControls.rotate([0.01, 0, 0]);
+                            figureStage.viewer.requestRender();
+                        }
+                    }
+                    setInterval(rotateMolecule, 50);
+                    console.log('✅ Fallback structure visualization complete!');
+
+                } catch (fallbackError) {
+                    console.log('❌ Fallback structure also failed:', fallbackError);
+                    console.log('📊 Fallback error details:', {
+                        name: fallbackError?.name || 'Unknown',
+                        message: fallbackError?.message || fallbackError?.toString() || 'No error message',
+                        stack: fallbackError?.stack || 'No stack trace'
+                    });
+
+                    // Try to create a simple test representation
+                    try {
+                        console.log('🧪 Creating test representation...');
+                        figureEl.innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(45deg, #e3f2fd, #fff3e0); color: #666; font-size: 14px; text-align: center; padding: 20px;">
+                                <div>
+                                    <div style="font-weight: bold; margin-bottom: 8px;">🧬 3D Molecular Structure</div>
+                                    <div style="font-size: 12px;">Structure visualization loading...</div>
+                                </div>
+                            </div>
+                        `;
+                    } catch (placeholderError) {
+                        console.log('❌ Even placeholder failed:', placeholderError);
+                    }
+                }
+            }
+        }
+
+        // ==================================================================
+        // INITIALIZE APPLICATION
+        // ==================================================================
+        function init() {
+            console.log('Initializing LLM Nanobody Results...');
+            initializeData();
+            initControls();
+            updateChart();
+
+            // Initialize 3D figure after a delay to ensure the DOM is ready
+            setTimeout(initMoleculeFigure, 500);
+
+            console.log('✅ Initialization complete!');
+        }
+
+        // Start the application when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
