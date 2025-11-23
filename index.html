@@ -402,6 +402,50 @@
             margin-bottom: 16px;
             position: relative;
             overflow: hidden;
+            cursor: grab;
+        }
+
+        .molecule-figure:hover {
+            cursor: grab;
+        }
+
+        .molecule-figure:active {
+            cursor: grabbing;
+        }
+
+        .figure-cursor-hint {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            width: 36px;
+            height: 36px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.7;
+            animation: wiggleFadeOut 5s ease-in-out forwards;
+        }
+
+        @keyframes wiggleFadeOut {
+            0% {
+                opacity: 0.6;
+                transform: translate(-6px, 0) rotate(0deg);
+            }
+            25% {
+                opacity: 0.7;
+                transform: translate(6px, 0) rotate(0deg);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(-6px, 0) rotate(0deg);
+            }
+            75% {
+                opacity: 0.6;
+                transform: translate(6px, 0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(0, 0) rotate(0deg);
+            }
         }
 
         .molecule-figure > div {
@@ -608,6 +652,35 @@
         html {
             scroll-behavior: smooth;
         }
+
+
+
+        .flaticon-attribution {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            font-size: 9px;
+            color: var(--text-muted);
+            z-index: 999;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+            text-align: right;
+            max-width: 200px;
+        }
+
+        .flaticon-attribution:hover {
+            opacity: 1;
+        }
+
+        .flaticon-attribution a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .flaticon-attribution a:hover {
+            color: var(--text-secondary);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -698,6 +771,11 @@
         </div>
     </div>
 
+
+    <!-- Flaticon Attribution -->
+    <div class="flaticon-attribution">
+        <a href="https://www.flaticon.com/free-icons/graphic-design" title="graphic design icons">Graphic design icons created by Freepik - Flaticon</a>
+    </div>
 
     <!-- Data -->
     <script src="ipsae_individual_data.js"></script>
@@ -1177,31 +1255,26 @@
                     console.log('🔄 Forced render after autoView');
                 }, 100);
 
-                // Temporarily disable rotation to test if it's causing the issue
-                const enableRotation = false; // Set to true to enable rotation
+                // Add cursor hint icon to the figure
+                const cursorHint = document.createElement('img');
+                cursorHint.src = 'move-selection-cursor.png';
+                cursorHint.alt = 'Interactive cursor hint';
+                cursorHint.className = 'figure-cursor-hint';
+                figureEl.appendChild(cursorHint);
 
-                if (enableRotation) {
-                    // Wait a bit before starting rotation to let the view settle
-                    setTimeout(() => {
-                        console.log('🔄 Starting gentle rotation...');
-                        // Add much slower, gentler rotation
-                        function rotateMolecule() {
-                            if (figureStage && figureStage.viewer && figureStage.compList.length > 0) {
-                                try {
-                                    figureStage.viewerControls.rotate([0.002, 0, 0]); // Much slower rotation
-                                    figureStage.viewer.requestRender();
-                                } catch (rotateError) {
-                                    console.log('Rotation error:', rotateError);
-                                }
-                            }
-                        }
+                // Hide cursor when user interacts
+                let hideTimeout;
+                figureEl.addEventListener('mousedown', () => {
+                    cursorHint.style.opacity = '0';
+                    cursorHint.style.transition = 'opacity 0.3s ease';
+                });
 
-                        // Start slower rotation loop
-                        setInterval(rotateMolecule, 100); // Rotate every 100ms instead of 50ms
-                    }, 2000); // Wait 2 seconds before starting rotation
-                } else {
-                    console.log('🔄 Rotation disabled for testing');
-                }
+                figureEl.addEventListener('mouseup', () => {
+                    clearTimeout(hideTimeout);
+                    hideTimeout = setTimeout(() => {
+                        cursorHint.style.opacity = '1';
+                    }, 3000);
+                });
 
                 console.log('✅ Molecule figure initialization complete!');
 
@@ -1238,14 +1311,27 @@
 
                     figureStage.autoView(1000);
 
-                    // Add rotation
-                    function rotateMolecule() {
-                        if (figureStage && figureStage.viewer) {
-                            figureStage.viewerControls.rotate([0.01, 0, 0]);
-                            figureStage.viewer.requestRender();
-                        }
-                    }
-                    setInterval(rotateMolecule, 50);
+                    // Add cursor hint icon to the figure
+                    const cursorHint = document.createElement('img');
+                    cursorHint.src = 'move-selection-cursor.png';
+                    cursorHint.alt = 'Interactive cursor hint';
+                    cursorHint.className = 'figure-cursor-hint';
+                    figureEl.appendChild(cursorHint);
+
+                    // Hide cursor when user interacts
+                    let hideTimeout;
+                    figureEl.addEventListener('mousedown', () => {
+                        cursorHint.style.opacity = '0';
+                        cursorHint.style.transition = 'opacity 0.3s ease';
+                    });
+
+                    figureEl.addEventListener('mouseup', () => {
+                        clearTimeout(hideTimeout);
+                        hideTimeout = setTimeout(() => {
+                            cursorHint.style.opacity = '1';
+                        }, 3000);
+                    });
+                    
                     console.log('✅ Fallback structure visualization complete!');
 
                 } catch (fallbackError) {
