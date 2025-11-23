@@ -12,7 +12,7 @@ An interactive visualization website showcasing the results of nanobody design e
 
 ## Live Demo
 
-Visit the live site: [https://raulcdinardi.github.io/nanobody-visualization-site]([nanobody-visualization])
+Visit the live site: [LLM-enabled nanobody design]([https://raulcdinardi.github.io/nanobody-visualization-site])
 
 ## Data
 
