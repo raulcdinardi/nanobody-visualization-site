@@ -2,7 +2,7 @@
 const IPSAE_EVALUATION_DATA = {
   "models": {
     "openai_api_deepseek_reasoner": {
-      "name": "DEEPSEEK REASONER",
+      "name": "DeepSeek v3.2",
       "color": "#AA96DA",
       "runs": [
         {
