@@ -1,5 +1,10 @@
 # LLM-Enabled Nanobody Design Results
 
+## Live Demo
+
+Visit the live site: [LLM-enabled nanobody design](https://raulcdinardi.github.io/nanobody-visualization-site)
+
+
 An interactive visualization website showcasing the results of nanobody design experiments using Large Language Models (LLMs).
 
 ## Features
@@ -9,10 +14,6 @@ An interactive visualization website showcasing the results of nanobody design e
 - **Model Filtering** - Toggle between different LLM models (DEEPSEEK REASONER, GPT-5, Claude Sonnet 4.0, Claude Haiku 4.5)
 - **Academic Paper Layout** - Clean, professional design with text-wrapped figures
 - **Responsive Design** - Works on desktop and mobile devices
-
-## Live Demo
-
-Visit the live site: [LLM-enabled nanobody design]([https://raulcdinardi.github.io/nanobody-visualization-site])
 
 ## Data
 
