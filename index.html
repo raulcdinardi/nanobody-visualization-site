@@ -388,7 +388,7 @@
 
         .figure-container {
             float: right;
-            width: 480px;
+            width: 400px;
             margin: 0 0 20px 20px;
             background: transparent;
             break-inside: avoid;
@@ -397,7 +397,7 @@
 
         .molecule-figure {
             width: 100%;
-            height: 380px;
+            height: 320px;
             background: transparent;
             margin-bottom: 16px;
             position: relative;
@@ -592,6 +592,22 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Reference link styling */
+        a[href^="#ref"] {
+            color: #4A90E2;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        a[href^="#ref"]:hover {
+            color: #357ABD;
+            text-decoration: underline;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
@@ -615,29 +631,21 @@
                 </div>
             </div>
 
-            <h2 style="font-size: 24px; font-weight: 600; margin: 40px 0 20px 0; color: var(--text-primary);">Abstract</h2>
-
-            <p>In the coming decades, AI will be one major contributor to the offense-defense balance. If we want to steer the future towards a high-robustness state, it is important to develop in advance a portfolio of defensive technologies that directly benefit from economic growth and technological progress.</p>
-
-            <p>What would a general defensive technology against biological threats look like? As a motivating example, we investigate whether present-day LLMs are capable of autonomous nanobody design. Using computational tools as a harness for protein design, we enable a generalist LLM to design and test nanobodies. Examination of performance trends across LLMs and reasoning efforts reveals performance improvements in the designed antibodies, demonstrating a scaling trend relevant for safety.</p>
-
-            <p>We argue that theoretical and empirical facts about LLMs make them exceptionally well suited for this type of hyperparameter search task. Moreover, this type of evaluation enables both a new paradigm for capabilities assessment and potential for scaling defensive technologies.</p>
-
-            <h2 style="font-size: 24px; font-weight: 600; margin: 40px 0 20px 0; color: var(--text-primary);">Introduction</h2>
-
             <p>We want to build technology that protects us from the biggest threats we will face as a society in the coming decades. To achieve this with high robustness it is important to maintain a balanced portfolio of defensive technologies that both leverage scaling factors like compute, power, and industrial capacity, while maintaining uncorrelated components that function independently of those general improvements.</p>
 
-            <p>Resilience against threats of biological origin is especially relevant due to direct impact on public health. This has been made apparent with the recent concerns about AI-enabled bio-threats. But, what if we could use the power of AI for the benefit of defense?</p>
+            <p>Resilience against threats of biological origin is especially relevant due to direct impact on public health. This has been made apparent with the recent concerns about AI-enabled bio-threats <a href="#ref6" style="color: #4A90E2; text-decoration: none;">[6]</a><a href="#ref7" style="color: #4A90E2; text-decoration: none;">[7]</a>. But, what if we could use the power of AI for the benefit of defense?</p>
 
             <p>To investigate this question, we focus on potential application of AI for Bio Defense, the automated design of pharmacological compounds. Concretely we focus on a type of protein: the nanobodies. Nanobodies (also known as Single Domain Antibodies) are a class of proteins with the ability to bind to specific antigens, much like antibodies, but substantially smaller and simpler.</p>
 
             <p>Nanobodies offer potential advantages that are highly relevant for situations in which a fast reaction is necessary (like a natural or man-made pandemic). For example, nanobodies have very short development times and don't require specialized equipment to be developed, this is specially relevant when dealing with fastly evolving strains. They also have many drawbacks, which would make mass deployment very challenging.</p>
 
-            <p>There is growing interest in using nanobodies for pharmaceutical applications. In recent years, the tools available to protein engineers have been dramatically expanded by ML-based biological models. This is also true for nanobody design. However despite the ease of use of these tools, many aspects of protein design are still poorly understood and rely on diffuse and tacit knowledge that only researchers have.</p>
+            <p>There is growing interest in using nanobodies for pharmaceutical applications <a href="#ref5" style="color: #4A90E2; text-decoration: none;">[5]</a><a href="#ref10" style="color: #4A90E2; text-decoration: none;">[10]</a><a href="#ref11" style="color: #4A90E2; text-decoration: none;">[11]</a>.</p>
+
+            <p>In recent years, the tools available to protein engineers have been dramatically expanded by ML-based biological models <a href="#ref12" style="color: #4A90E2; text-decoration: none;">[12]</a><a href="#ref13" style="color: #4A90E2; text-decoration: none;">[13]</a>. This is also true for nanobody design <a href="#ref2" style="color: #4A90E2; text-decoration: none;">[2]</a>. However despite the ease of use of these tools, many aspects of protein design are still poorly understood and rely on diffuse and tacit knowledge that only researchers have.</p>
 
             <p>This prompts our central question: <strong>"Can we leverage the biological knowledge present in state-of-the-art LLMs to automate the design of nanobodies?"</strong></p>
 
-            <p>To answer this question we evaluate several LLMs on the autonomous design of nanobodies for Nipah virus using RFantibody as a harness. Several in-silico metrics will be used to assess the quality of the designed nanobodies.</p>
+            <p>To answer this question we evaluate several LLMs on the autonomous design of nanobodies for Nipah virus using RFantibody as a harness. Several in-silico metrics <a href="#ref4" style="color: #4A90E2; text-decoration: none;">[4]</a> will be used to assess the quality of the designed nanobodies.</p>
         </div>
 
         <!-- Model Filter -->
@@ -667,6 +675,26 @@
                 </div>
             </div>
             <svg id="chart"></svg>
+        </div>
+
+        <!-- References Section -->
+        <div class="content-text" style="margin-top: 80px;">
+            <h2 style="font-size: 24px; font-weight: 600; margin: 40px 0 20px 0; color: var(--text-primary);">References</h2>
+            <ol style="list-style: decimal; padding-left: 20px; line-height: 1.8;">
+                <li id="ref1" style="margin-bottom: 16px;"><strong>Adaptyv Bio.</strong> (2025, November 7). <em>The protein design competition is back!</em> Adaptyv Bio Substack. <a href="https://adaptyvbio.substack.com/p/the-protein-design-competition-is" target="_blank" style="color: #4A90E2; text-decoration: none;">Link</a></li>
+                <li id="ref2" style="margin-bottom: 16px;"><strong>Bennett, N. R.,</strong> Watson, J. L., Ragotte, R. J., Borst, A. J., See, D. L., Weidle, C., ... & Baker, D. (2025). Atomically accurate de novo design of antibodies with RFdiffusion. <em>Nature</em>, <em>638</em>, 320–327. <a href="https://doi.org/10.1038/s41586-025-09721-5" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.1038/s41586-025-09721-5</a></li>
+                <li id="ref3" style="margin-bottom: 16px;"><strong>Bryant, P.,</strong> Pozzati, G., & Elofsson, A. (2022). Improved prediction of protein-protein interactions using AlphaFold2. <em>Nature Communications</em>, <em>13</em>, Article 1664. <a href="https://doi.org/10.1038/s41467-022-28865-w" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.1038/s41467-022-28865-w</a></li>
+                <li id="ref4" style="margin-bottom: 16px;"><strong>Dunbrack Lab.</strong> (2025). <em>IPSAE: Scoring function for interprotein interactions in AlphaFold2 and AlphaFold3</em> [Computer software]. GitHub. <a href="https://github.com/DunbrackLab/IPSAE" target="_blank" style="color: #4A90E2; text-decoration: none;">Link</a></li>
+                <li id="ref5" style="margin-bottom: 16px;"><strong>Lim, H. E.,</strong> Kim, S., & Yoo, H. (2025). Regulation of cellular states via targeted phosphorylation of p53 using a nanobody-coupled kinase system. <em>Cell Death Discovery</em>, <em>11</em>, Article 82. <a href="https://doi.org/10.1038/s41420-025-02821-1" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.1038/s41420-025-02821-1</a></li>
+                <li id="ref6" style="margin-bottom: 16px;"><strong>Manheim, D.,</strong> Williams, A., Aveggio, C., & Berke, A. (2025). <em>Understanding the theoretical limits of AI-enabled pathogen design</em> (Research Report No. RRA4087-1). RAND Corporation. <a href="https://www.rand.org/pubs/research_reports/RRA4087-1.html" target="_blank" style="color: #4A90E2; text-decoration: none;">Link</a></li>
+                <li id="ref7" style="margin-bottom: 16px;"><strong>Norwood, S. A.</strong> (2025, April 15). <em>Understanding AI-enabled biological threats: Hype, hazard, and governance</em>. Cambridge Engineering Biology. <a href="https://www.engbio.cam.ac.uk/news/understanding-ai-enabled-biological-threats-hype-hazard-and-governance" target="_blank" style="color: #4A90E2; text-decoration: none;">Link</a></li>
+                <li id="ref8" style="margin-bottom: 16px;"><strong>Novikov, A.,</strong> Vu, N., Eisenberger, M., Dupont, E., Huang, P. S., Wagner, A. Z., ... & Kohli, P. (2025). <em>AlphaEvolve: A coding agent for scientific and algorithmic discovery</em>. arXiv. <a href="https://doi.org/10.48550/arXiv.2506.13131" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.48550/arXiv.2506.13131</a></li>
+                <li id="ref9" style="margin-bottom: 16px;"><strong>Romera-Paredes, B.,</strong> Barekatain, M., Novikov, A., Balog, M., Kumar, M. P., Dupont, E., ... & Fawzi, A. (2024). Mathematical discoveries from program search with large language models. <em>Nature</em>, <em>625</em>, 468–475. <a href="https://doi.org/10.1038/s41586-023-06924-6" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.1038/s41586-023-06924-6</a></li>
+                <li id="ref10" style="margin-bottom: 16px;"><strong>Wang, Z.,</strong> Wu, H., He, W., Wei, S., Wei, X., Wei, C., Wang, Y., & Huang, A. (2025). Protective effect of nanobodies targeting Sip protein against <em>Streptococcus agalactiae</em> infection in Tilapia. <em>Animals</em>, <em>15</em>(21), Article 3207. <a href="https://doi.org/10.3390/ani15213207" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.3390/ani15213207</a></li>
+                <li id="ref11" style="margin-bottom: 16px;"><strong>Wu, X.,</strong> Zhu, L., Liang, S., Chang, Z., Wang, Y., Zou, Q., ... & Li, M. (2025). A rationally designed cocktail of nanobodies elicited by heterologous vaccination confers protection against SFTSV. <em>Science Translational Medicine</em>, <em>17</em>(825). <a href="https://doi.org/10.1126/scitranslmed.ady9025" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.1126/scitranslmed.ady9025</a></li>
+                <li id="ref12" style="margin-bottom: 16px;"><strong>Dauparas, J.,</strong> Anishchenko, I., Bennett, N. R., Bai, H., Ragotte, R. J., Milles, L. F., ... & Baker, D. (2022). Robust deep learning–based protein sequence design using ProteinMPNN. <em>Science</em>, <em>378</em>(6615), 49–56. <a href="https://doi.org/10.1126/science.add2187" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.1126/science.add2187</a></li>
+                <li id="ref13" style="margin-bottom: 16px;"><strong>Jumper, J.,</strong> Evans, R., Pritzel, A., Green, T., Figurnov, M., Ronneberger, O., ... & Hassabis, D. (2021). Highly accurate protein structure prediction with AlphaFold. <em>Nature</em>, <em>596</em>(7873), 583–589. <a href="https://doi.org/10.1038/s41586-021-03819-2" target="_blank" style="color: #4A90E2; text-decoration: none;">doi:10.1038/s41586-021-03819-2</a></li>
+            </ol>
         </div>
     </div>
 
