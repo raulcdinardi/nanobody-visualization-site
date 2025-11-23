@@ -281,7 +281,7 @@ const IPSAE_EVALUATION_DATA = {
       ]
     },
     "human_baseline": {
-      "name": "Human Baseline",
+      "name": "Baseline",
       "color": "#6B7280",
       "runs": [
         {
