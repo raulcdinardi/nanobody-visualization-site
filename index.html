@@ -915,7 +915,7 @@
                 if (modelId === 'openai_gpt5') {
                     return; // keep data available but do not display
                 }
-            activeModels.add(modelId); // Initially all models are active
+                activeModels.add(modelId); // Initially all models are active
 
                 modelData.runs.forEach(run => {
                     allRuns.push({
@@ -990,6 +990,9 @@
             // Model toggles
             const modelToggles = d3.select('#modelToggles');
             Object.entries(IPSAE_EVALUATION_DATA.models).forEach(([id, model]) => {
+                if (id === 'openai_gpt5') {
+                    return; // hide GPT-5 toggle
+                }
                 const btn = modelToggles.append('button')
                     .attr('class', 'model-toggle active')
                     .style('border-color', model.color)
