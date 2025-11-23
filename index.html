@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antibody Design - Interactive Data Table</title>
+    <title>LLM-Enabled Nanobody Design</title>
 
     <!-- D3.js for data manipulation -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -708,6 +708,11 @@
         <!-- Title -->
         <div style="text-align: center; margin-bottom: 40px;">
             <h1>LLM-Enabled Nanobody Design</h1>
+            <div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">
+                <a href="https://apartresearch.com/sprints/def-acc-hackathon-2025-11-21-to-2025-11-23" target="_blank" rel="noopener" style="color: var(--text-secondary); text-decoration: underline;">
+                    Apart Defensive Acceleration Hackathon Submission
+                </a>
+            </div>
         </div>
 
         <!-- Read Paper Button -->
@@ -859,7 +864,7 @@
         }
 
         // Smooth sine-wave cursor float with fade in/out and delayed start
-        function startCursorHintAnimation(hintEl, delayMs = 900, durationMs = 8000, amplitude = 12) {
+        function startCursorHintAnimation(hintEl, delayMs = 900, durationMs = 5500, amplitude = 12) {
             if (!hintEl) return;
             if (figureCursorAnimationId) {
                 cancelAnimationFrame(figureCursorAnimationId);
@@ -907,7 +912,10 @@
             allRuns = [];
 
             Object.entries(IPSAE_EVALUATION_DATA.models).forEach(([modelId, modelData]) => {
-                activeModels.add(modelId); // Initially all models are active
+                if (modelId === 'openai_gpt5') {
+                    return; // keep data available but do not display
+                }
+            activeModels.add(modelId); // Initially all models are active
 
                 modelData.runs.forEach(run => {
                     allRuns.push({

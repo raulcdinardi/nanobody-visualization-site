@@ -279,6 +279,27 @@ const IPSAE_EVALUATION_DATA = {
           "hotspots": []
         }
       ]
+    },
+    "human_baseline": {
+      "name": "Human Baseline",
+      "color": "#6B7280",
+      "runs": [
+        {
+          "model_id": "human_baseline",
+          "config_id": "human_baseline_avg",
+          "config_label": "Human Avg",
+          "model_key": "human_baseline",
+          "ipSAE": 0.16351944666666668,
+          "ipSAE_d0chn": 0.33618857333333335,
+          "ipSAE_d0dom": 0.23629376,
+          "pDockQ": 0.200742,
+          "LIS": 0.12720866666666666,
+          "n0res": 105.05333333333333,
+          "d0res": 2.8338,
+          "structure_path": "",
+          "hotspots": []
+        }
+      ]
     }
   },
   "metrics": {
