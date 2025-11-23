@@ -42,12 +42,29 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             padding: 40px 20px;
             line-height: 1.5;
         }
+
+        body, button, input, select, option, textarea {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        svg text {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, .chart-title {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .paper-btn {
+            font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+        }
+
 
         .container {
             max-width: 1400px;
@@ -388,6 +405,8 @@
             line-height: 1.8;
             color: var(--text-secondary);
             font-size: 18px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 400;
         }
 
         .content-text p {
@@ -401,6 +420,8 @@
             color: var(--text-secondary);
             font-size: 18px;
             text-align: justify;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 400;
         }
 
         .content-text-with-figure p {
@@ -443,19 +464,8 @@
             z-index: 10;
             pointer-events: none;
             opacity: 0;
-            animation: cursorFloat 6.5s ease-in-out forwards;
-            animation-delay: 0.1s;
-        }
-
-        @keyframes cursorFloat {
-            0% { opacity: 0; transform: translateY(0) scale(1); }
-            10% { opacity: 1; transform: translateY(0) scale(1); }
-            25% { transform: translateY(-10px) scale(1); }
-            40% { transform: translateY(0) scale(1); }
-            55% { transform: translateY(10px) scale(1); }
-            70% { transform: translateY(0) scale(1); }
-            85% { transform: translateY(-6px) scale(0.98); }
-            100% { opacity: 0; transform: translateY(0) scale(0.96); }
+            transform: translateY(0);
+            will-change: transform, opacity;
         }
 
         .molecule-figure > div {
@@ -702,7 +712,7 @@
 
         <!-- Read Paper Button -->
         <div style="text-align: center; margin-bottom: 60px;">
-            <a href="#" id="paperLink" class="paper-btn">Read Full Paper</a>
+            <a href="paper.pdf" id="paperLink" class="paper-btn" target="_blank">Read Full Paper</a>
         </div>
 
         <!-- Text with 3D Figure -->
@@ -818,6 +828,7 @@
         let figureStage = null;
         let figureSpinTimeout = null;
         let figureSpinPausedByUser = false;
+        let figureCursorAnimationId = null;
 
         // Gently spins the protein once the initial autoView completes
         function scheduleFigureSpin(stage, delay = FIGURE_SPIN_DELAY) {
@@ -845,6 +856,47 @@
             if (stage && typeof stage.setSpin === 'function') {
                 stage.setSpin(false);
             }
+        }
+
+        // Smooth sine-wave cursor float with fade in/out and delayed start
+        function startCursorHintAnimation(hintEl, delayMs = 900, durationMs = 8000, amplitude = 12) {
+            if (!hintEl) return;
+            if (figureCursorAnimationId) {
+                cancelAnimationFrame(figureCursorAnimationId);
+            }
+
+            const startAt = performance.now() + delayMs;
+            const endAt = startAt + durationMs;
+
+            const frame = (now) => {
+                if (now < startAt) {
+                    figureCursorAnimationId = requestAnimationFrame(frame);
+                    return;
+                }
+
+                const t = Math.min(1, (now - startAt) / durationMs);
+                const angle = t * Math.PI * 2; // one smooth up/down cycle
+                const y = Math.sin(angle) * amplitude;
+
+                let alpha = 1;
+                if (t < 0.12) {
+                    alpha = t / 0.12;
+                } else if (t > 0.88) {
+                    alpha = Math.max(0, (1 - t) / 0.12);
+                }
+
+                hintEl.style.opacity = alpha.toFixed(3);
+                hintEl.style.transform = `translateY(${y.toFixed(2)}px)`;
+
+                if (now < endAt) {
+                    figureCursorAnimationId = requestAnimationFrame(frame);
+                } else {
+                    hintEl.style.opacity = '0';
+                    hintEl.style.transform = 'translateY(0px)';
+                }
+            };
+
+            figureCursorAnimationId = requestAnimationFrame(frame);
         }
 
         // ==================================================================
@@ -1350,6 +1402,7 @@
                 cursorHint.alt = 'Interactive cursor hint';
                 cursorHint.className = 'figure-cursor-hint';
                 figureEl.appendChild(cursorHint);
+                startCursorHintAnimation(cursorHint);
 
                 // Hide cursor when user interacts
                 let hideTimeout;
@@ -1430,6 +1483,7 @@
                     cursorHint.alt = 'Interactive cursor hint';
                     cursorHint.className = 'figure-cursor-hint';
                     figureEl.appendChild(cursorHint);
+                    startCursorHintAnimation(cursorHint);
 
                     // Hide cursor when user interacts
                     let hideTimeout;
