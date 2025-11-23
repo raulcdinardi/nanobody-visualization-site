@@ -849,6 +849,9 @@
                 });
             });
 
+            // Sort models by average score (descending)
+            modelAverages.sort((a, b) => b.value - a.value);
+
             // Scales
             const x = d3.scaleBand()
                 .domain(modelAverages.map(d => d.name))
@@ -931,7 +934,9 @@
             const individualData = [];
             Array.from(activeModels).forEach(modelId => {
                 const model = IPSAE_EVALUATION_DATA.models[modelId];
-                model.runs.forEach((run, index) => {
+                // Sort runs by score (descending) within each model
+                const sortedRuns = [...model.runs].sort((a, b) => b[currentMetric] - a[currentMetric]);
+                sortedRuns.forEach((run, index) => {
                     individualData.push({
                         modelId,
                         modelName: model.name,
@@ -946,7 +951,23 @@
 
             // Group by model for positioning
             const modelGroups = d3.group(individualData, d => d.modelId);
-            const modelNames = Array.from(activeModels).map(id => IPSAE_EVALUATION_DATA.models[id].name);
+            
+            // Calculate average score for each model and sort by it
+            const modelAverages = [];
+            Array.from(activeModels).forEach(modelId => {
+                const model = IPSAE_EVALUATION_DATA.models[modelId];
+                const values = model.runs.map(run => run[currentMetric]);
+                const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+                modelAverages.push({
+                    modelId,
+                    name: model.name,
+                    avg: avg
+                });
+            });
+            
+            // Sort models by average score (descending)
+            modelAverages.sort((a, b) => b.avg - a.avg);
+            const modelNames = modelAverages.map(m => m.name);
 
             // Scales
             const x0 = d3.scaleBand()
