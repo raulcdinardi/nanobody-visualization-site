@@ -861,6 +861,27 @@
         }
 
         // ==================================================================
+        // HELPER FUNCTIONS
+        // ==================================================================
+        function formatModelNameForChart(name) {
+            // Format model name for histogram: keep .0 for Claude Sonnet 4.0, keep GPT-5 as is
+            let formatted = name;
+            
+            // Keep GPT-5 as GPT-5 (don't change case)
+            if (formatted.toUpperCase().includes('GPT-5')) {
+                return 'GPT-5';
+            }
+            
+            // Convert to title case
+            formatted = formatted.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+            // Keep .0 for Claude Sonnet 4.0, but remove .0 from others if present
+            if (!formatted.includes('Claude Sonnet 4.0')) {
+                formatted = formatted.replace(/\.0$/, '');
+            }
+            return formatted;
+        }
+
+        // ==================================================================
         // INITIALIZE CONTROLS
         // ==================================================================
         function initControls() {
@@ -903,7 +924,7 @@
                     .style('border-color', model.color)
                     .style('background', model.color)
                     .style('color', 'white')
-                    .text(model.name)
+                    .text(formatModelNameForChart(model.name))
                     .on('click', function() {
                         const button = d3.select(this);
                         if (activeModels.has(id)) {
@@ -938,18 +959,6 @@
             } else {
                 updateIndividualChart();
             }
-        }
-
-        function formatModelNameForChart(name) {
-            // Format model name for histogram: keep .0 for Claude Sonnet 4.0, format others
-            let formatted = name;
-            // Convert to title case
-            formatted = formatted.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
-            // Keep .0 for Claude Sonnet 4.0, but remove .0 from others if present
-            if (!formatted.includes('Claude Sonnet 4.0')) {
-                formatted = formatted.replace(/\.0$/, '');
-            }
-            return formatted;
         }
 
         function updateAverageChart() {
